@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo_app_example/screens/stats_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../services/hive_service.dart';
 
@@ -118,10 +119,18 @@ class HomeScreen extends StatelessWidget {
         title: const Text("My Tasks"),
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.bar_chart),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const StatsScreen()),
+              );
+            },
+          ),
           IconButton(icon: const Icon(Icons.dark_mode), onPressed: toggleTheme),
         ],
       ),
-
       body: ValueListenableBuilder(
         valueListenable: box.listenable(),
         builder: (context, box, _) {
@@ -142,7 +151,7 @@ class HomeScreen extends StatelessWidget {
                   boxShadow: [
                     BoxShadow(
                       blurRadius: 10,
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withOpacity(0.25),
                       offset: const Offset(0, 5),
                     ),
                   ],
@@ -152,7 +161,6 @@ class HomeScreen extends StatelessWidget {
                     horizontal: 16,
                     vertical: 10,
                   ),
-
                   title: Text(
                     task["title"],
                     style: TextStyle(
@@ -163,14 +171,12 @@ class HomeScreen extends StatelessWidget {
                           : null,
                     ),
                   ),
-
                   subtitle: Text(
                     task["date"] != null
                         ? task["date"].toString().split(" ")[0]
                         : "",
                     style: const TextStyle(fontSize: 12),
                   ),
-
                   leading: GestureDetector(
                     onTap: () {
                       service.toggleTask(index);
@@ -195,14 +201,12 @@ class HomeScreen extends StatelessWidget {
                           : null,
                     ),
                   ),
-
                   trailing: IconButton(
                     icon: const Icon(Icons.delete_outline),
                     onPressed: () {
-                      service.deleteTask(index);
+                      showDeleteDialog(context, index);
                     },
                   ),
-
                   onTap: () {
                     showEditDialog(context, index, task["title"]);
                   },
@@ -212,11 +216,40 @@ class HomeScreen extends StatelessWidget {
           );
         },
       ),
-
       floatingActionButton: FloatingActionButton(
         onPressed: () => showAddDialog(context),
         child: const Icon(Icons.add),
       ),
+    );
+  }
+
+  void showDeleteDialog(BuildContext context, int index) {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text("Are you sure?"),
+          content: const Text("This task will be deleted."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                service.deleteTask(index);
+                Navigator.pop(context);
+              },
+              child: const Text("Delete", style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
     );
   }
 }
