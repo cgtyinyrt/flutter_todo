@@ -117,6 +117,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("My Tasks"),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         centerTitle: true,
         actions: [
           IconButton(
@@ -141,6 +142,7 @@ class HomeScreen extends StatelessWidget {
             itemCount: tasks.length,
             itemBuilder: (context, index) {
               var task = tasks[index];
+              final isDark = Theme.of(context).brightness == Brightness.dark;
 
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
@@ -151,7 +153,9 @@ class HomeScreen extends StatelessWidget {
                   boxShadow: [
                     BoxShadow(
                       blurRadius: 10,
-                      color: Colors.black.withOpacity(0.25),
+                      color: isDark
+                          ? Colors.black.withOpacity(0.45)
+                          : Colors.black.withOpacity(0.15),
                       offset: const Offset(0, 5),
                     ),
                   ],
@@ -161,22 +165,29 @@ class HomeScreen extends StatelessWidget {
                     horizontal: 16,
                     vertical: 10,
                   ),
+
                   title: Text(
                     task["title"],
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
+                      color: isDark ? Colors.white : Colors.black,
                       decoration: task["isDone"]
                           ? TextDecoration.lineThrough
                           : null,
                     ),
                   ),
+
                   subtitle: Text(
                     task["date"] != null
                         ? task["date"].toString().split(" ")[0]
                         : "",
-                    style: const TextStyle(fontSize: 12),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark ? Colors.white70 : Colors.black54,
+                    ),
                   ),
+
                   leading: GestureDetector(
                     onTap: () {
                       service.toggleTask(index);
@@ -190,7 +201,9 @@ class HomeScreen extends StatelessWidget {
                             ? Colors.green
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: Colors.grey),
+                        border: Border.all(
+                          color: isDark ? Colors.white70 : Colors.grey,
+                        ),
                       ),
                       child: task["isDone"]
                           ? const Icon(
@@ -201,12 +214,17 @@ class HomeScreen extends StatelessWidget {
                           : null,
                     ),
                   ),
+
                   trailing: IconButton(
-                    icon: const Icon(Icons.delete_outline),
+                    icon: Icon(
+                      Icons.delete_outline,
+                      color: isDark ? Colors.white70 : Colors.black54,
+                    ),
                     onPressed: () {
                       showDeleteDialog(context, index);
                     },
                   ),
+
                   onTap: () {
                     showEditDialog(context, index, task["title"]);
                   },
@@ -218,6 +236,7 @@ class HomeScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => showAddDialog(context),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         child: const Icon(Icons.add),
       ),
     );
